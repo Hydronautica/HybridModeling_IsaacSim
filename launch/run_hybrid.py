@@ -15,6 +15,9 @@ if str(REPO_ROOT) not in sys.path:
 
 ensure_isaac_python_path()
 
+from omni.isaac.core import World
+from omni.isaac.kit import SimulationApp
+
 from extensions.floating_body.scripts.floater_setup import spawn_floater
 from extensions.hybrid.mooring.scripts.drag_grab_enable import enable_mouse_grab
 from extensions.hybrid.mooring.scripts.franka_cartesian_impedance import ImpedanceGains
@@ -30,8 +33,13 @@ class DummyFrankaController:
 
 
 def main():
-    floater = spawn_floater()
+    sim_app = SimulationApp({"renderer": "RayTracedLighting", "headless": False})
+    world = World(stage_units_in_meters=1.0)
+
+    floater = spawn_floater(world=world)
     enable_mouse_grab()
+
+    world.reset()
 
     config = HybridConfig(
         mooring_params=MooringParameters.from_yaml(
@@ -51,7 +59,10 @@ def main():
     sim_time = 0.0
     while sim_time < 0.05:
         hybrid.step(dt)
+        world.step(render=True)
         sim_time += dt
+
+    sim_app.close()
 
 
 if __name__ == "__main__":
