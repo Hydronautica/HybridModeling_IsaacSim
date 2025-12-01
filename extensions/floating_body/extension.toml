@@ -1,0 +1,9 @@
+[package]
+version = "0.1.0"
+category = "assets"
+title = "Floating Body"
+description = "Floater rigid body, hydrodynamics, and wave helpers"
+authors = ["Research Sandbox"]
+
+[python]
+module = "extensions.floating_body"
