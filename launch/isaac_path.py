@@ -25,10 +25,11 @@ def _collect_candidate_paths() -> List[str]:
 
     root = os.environ.get("ISAACSIM_ROOT") or os.environ.get("ISAACSIM_PATH")
     if root:
-        root_path = pathlib.Path(root)
-        for suffix in ("python", "kit/python"):
-            candidate = root_path / suffix
-            candidates.append(str(candidate))
+        candidates.extend(_expand_python_subpaths(pathlib.Path(root)))
+
+    if not candidates:
+        for root_path in _discover_default_roots():
+            candidates.extend(_expand_python_subpaths(root_path))
 
     return candidates
 
@@ -37,6 +38,45 @@ def _prepend_paths(paths: Iterable[str]) -> None:
     for path in paths:
         if path and path not in sys.path:
             sys.path.insert(0, path)
+
+
+def _expand_python_subpaths(root: pathlib.Path) -> List[str]:
+    """Return Python module search paths for a given Isaac Sim root."""
+
+    paths: List[str] = []
+
+    for prefix in (root / "python", root / "kit" / "python"):
+        paths.append(str(prefix))
+        paths.extend(
+            str(site_packages)
+            for site_packages in prefix.glob("lib/python*/site-packages")
+            if site_packages.is_dir()
+        )
+
+    return paths
+
+
+def _discover_default_roots() -> List[pathlib.Path]:
+    """Return Isaac Sim 5.x install roots from common default locations."""
+
+    def _candidate_roots(base_dir: pathlib.Path) -> List[pathlib.Path]:
+        if not base_dir.is_dir():
+            return []
+        return sorted(
+            (d for d in base_dir.iterdir() if d.is_dir() and d.name.startswith("isaac-sim-5")),
+            reverse=True,
+        )
+
+    linux_base = pathlib.Path.home() / ".local" / "share" / "ov" / "pkg"
+    windows_base = pathlib.Path(
+        os.environ.get("LOCALAPPDATA", pathlib.Path.home() / "AppData" / "Local")
+    ) / "ov" / "pkg"
+
+    roots: List[pathlib.Path] = []
+    for base in (linux_base, windows_base):
+        roots.extend(_candidate_roots(base))
+
+    return roots
 
 
 def ensure_isaac_python_path() -> None:
@@ -49,12 +89,14 @@ def ensure_isaac_python_path() -> None:
     guidance if Isaac Sim is unavailable.
     """
 
-    _prepend_paths(_collect_candidate_paths())
+    candidates = _collect_candidate_paths()
+    _prepend_paths(candidates)
 
     if importlib.util.find_spec("omni.isaac.core") is None:
-        raise ModuleNotFoundError(
-            "omni.isaac.core not found. Launch using the Isaac Sim Python "
-            "interpreter (python.sh/python.bat) or set ISAACSIM_PYTHON_PATH to "
-            "<isaac-sim-root>/python."
-        )
-
+        message = [
+            "omni.isaac.core not found. Launch using the Isaac Sim Python ",
+            "interpreter (python.sh/python.bat) or set ISAACSIM_PYTHON_PATH to ",
+            "<isaac-sim-root>/python. Searched: ",
+            os.pathsep.join(candidates),
+        ]
+        raise ModuleNotFoundError("".join(message))
