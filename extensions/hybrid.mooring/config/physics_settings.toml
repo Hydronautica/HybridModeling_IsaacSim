@@ -1,0 +1,12 @@
+# PhysX and scene defaults for the hybrid simulation
+[timestep]
+dt = 0.005
+substeps = 4
+
+[physx]
+solver_type = "TGS"
+friction_coefficient = 0.7
+restitution = 0.0
+
+[render]
+use_path_tracing = false

@@ -1,0 +1,15 @@
+stiffness:
+  surge: 2500.0
+  sway: 2500.0
+  heave: 4000.0
+  roll: 600.0
+  pitch: 600.0
+  yaw: 500.0
+
+damping:
+  surge: 120.0
+  sway: 120.0
+  heave: 160.0
+  roll: 35.0
+  pitch: 35.0
+  yaw: 25.0

@@ -1,0 +1,7 @@
+impedance:
+  translational_stiffness: [400.0, 400.0, 600.0]
+  translational_damping: [50.0, 50.0, 70.0]
+  rotational_stiffness: [25.0, 25.0, 25.0]
+  rotational_damping: [3.5, 3.5, 3.5]
+
+torque_limits: [85.0, 85.0, 85.0, 85.0, 10.0, 10.0, 10.0]
