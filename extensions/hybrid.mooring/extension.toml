@@ -1,0 +1,9 @@
+[package]
+version = "0.1.0"
+category = "simulation"
+title = "Hybrid Mooring Controller"
+description = "Numerical mooring model coupled to a Franka arm and floating body"
+authors = ["Research Sandbox"]
+
+[python]
+module = "extensions.hybrid.mooring"
