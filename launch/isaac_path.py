@@ -95,11 +95,21 @@ def ensure_isaac_python_path() -> None:
     candidates = _collect_candidate_paths()
     _prepend_paths(candidates)
 
-    if importlib.util.find_spec("omni.isaac.core") is None:
+    if not _isaac_modules_available():
         message = [
-            "omni.isaac.core not found. Launch using the Isaac Sim Python ",
-            "interpreter (python.sh/python.bat) or set ISAACSIM_PYTHON_PATH to ",
-            "<isaac-sim-root>/python. Searched: ",
+            "Isaac Sim modules not found (expected omni.isaac.sim or omni.isaac.core). ",
+            "Launch using the Isaac Sim Python interpreter (python.sh/python.bat) or set ",
+            "ISAACSIM_PYTHON_PATH to <isaac-sim-root>/python. Searched: ",
             os.pathsep.join(candidates),
         ]
         raise ModuleNotFoundError("".join(message))
+
+
+def _isaac_modules_available() -> bool:
+    """Return ``True`` if key Isaac Sim 5.0 Python modules can be imported."""
+
+    for module_name in ("omni.isaac.sim", "omni.isaac.core"):
+        if importlib.util.find_spec(module_name) is not None:
+            return True
+
+    return False
