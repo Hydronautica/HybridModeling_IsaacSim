@@ -18,3 +18,6 @@ hybrid_floater_system/
 3. Use `drag_grab_enable.py` to toggle PhysX grab-and-drag during debugging.
 
 The scripts are intentionally lightweight: they are meant as templates for integrating real hydrodynamics, mooring solvers, and control laws.
+
+## Usage
+Run the launchers with the Isaac Sim Python interpreter so that modules such as `omni.isaac.core` are discoverable. On Linux/macOS, use `python.sh`; on Windows, use `python.bat` from the Isaac Sim installation directory. Alternatively, set the environment variable `ISAACSIM_PYTHON_PATH` to `<isaac-sim-root>/python` before executing `launch/run_sim.py` or `launch/run_hybrid.py`. If Isaac Sim is not available on the Python path, the launchers will raise a clear error describing how to resolve the issue.

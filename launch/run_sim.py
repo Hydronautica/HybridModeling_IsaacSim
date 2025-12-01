@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+import pathlib
+import sys
+
+from isaac_path import ensure_isaac_python_path
+
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.append(str(REPO_ROOT))
+
+ensure_isaac_python_path()
+
 from extensions.floating_body.scripts.floater_setup import spawn_floater
 from extensions.floating_body.scripts.wave_forcing import airy_wave_elevation
 
