@@ -31,6 +31,9 @@ def _collect_candidate_paths() -> List[str]:
         for root_path in _discover_default_roots():
             candidates.extend(_expand_python_subpaths(root_path))
 
+    if not candidates:
+        candidates.extend(_discover_default_python_paths())
+
     return candidates
 
 
