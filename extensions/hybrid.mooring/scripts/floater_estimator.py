@@ -1,4 +1,4 @@
-"""Helpers for reading floater state inside Isaac Sim."""
+"""Helpers for reading floater state from the simulation backend."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ class FloaterState:
 
 
 class FloaterEstimator:
-    """Thin wrapper around an Isaac Sim prim for easier mocking."""
+    """Thin wrapper around the floater object for easier mocking and swapping backends."""
 
     def __init__(self, floater):
         self._floater = floater

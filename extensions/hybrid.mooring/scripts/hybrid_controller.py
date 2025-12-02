@@ -7,7 +7,7 @@ from typing import Iterable
 
 import numpy as np
 
-from .floater_estimator import FloaterEstimator
+from .floater_estimator import FloaterEstimator, FloaterState
 from .franka_cartesian_impedance import FrankaCartesianImpedance, ImpedanceGains
 from .mooring_model import MooringParameters, combine_wrenches, compute_mooring_force
 
@@ -16,6 +16,15 @@ from .mooring_model import MooringParameters, combine_wrenches, compute_mooring_
 class HybridConfig:
     mooring_params: MooringParameters
     franka_gains: ImpedanceGains
+
+
+@dataclass
+class HybridStepResult:
+    state: FloaterState
+    mooring_wrench: np.ndarray
+    end_effector_wrench: np.ndarray
+    commanded_wrench: np.ndarray
+    joint_torques: np.ndarray
 
 
 class HybridController:
@@ -31,7 +40,7 @@ class HybridController:
         wrench_vec = np.asarray(floater_wrench, dtype=float)
         return wrench_vec
 
-    def step(self, dt: float) -> None:
+    def step(self, dt: float) -> HybridStepResult:
         state = self.floater_estimator.get_state()
         floater_twist = state.as_twist()
         floater_disp = np.concatenate((state.position, np.zeros(3)))
@@ -43,3 +52,10 @@ class HybridController:
         torques = self.franka_impedance.step(state.position, floater_twist, commanded_wrench)
 
         self.franka_controller.apply_action(torques, dt)
+        return HybridStepResult(
+            state=state,
+            mooring_wrench=mooring_wrench,
+            end_effector_wrench=end_effector_wrench,
+            commanded_wrench=commanded_wrench,
+            joint_torques=torques,
+        )
